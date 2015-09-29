@@ -26,6 +26,7 @@
 	$create_passw = "";
 	$age = "";
 	$city = "";
+	$hash = "";
 	
 	
 	// kontrollime et keegi vajutas input nuppu
@@ -76,70 +77,71 @@
 			}
 			
 		}
-		
+	
 		//Kasutaja loomine
 		if(isset($_POST["submit"])){
 		//kontrollin et eesnimi ei ole tühi
 			if (empty($_POST["first_name"])){
-			$fname_error = "see väli on kohustulik";
+				$fname_error = "see väli on kohustulik";
 			}else{
 				$fname=test_input($_POST["first_name"]);
-			}
+			};
 			if (empty($_POST["last_name"])){
-			$lname_error = "see väli on kohustulik";
+				$lname_error = "see väli on kohustulik";
 			}else{
 				$lname=test_input($_POST["last_name"]);
-			}
+			};
 			if (empty($_POST["create_email"])){
-			$create_email_error = " see väli on kohustulik";			
+				$create_email_error = " see väli on kohustulik";			
 			} else {
 				$create_email=test_input($_POST["create_email"]);
 			}
 			if (empty($_POST["create_password"])){
-			$create_password_error = "see väli on kohustulik";	
+				$create_password_error = "see väli on kohustulik";	
 			} else {			
 				if(strlen($_POST["create_password"]) < 8){
-				$create_password_error="peab olema vähemalt 8 tähemärki";
+					$create_password_error="peab olema vähemalt 8 tähemärki";
 				
 				} else{
-				$create_password = test_input($_POST["create_password"]);
+					$create_password = test_input($_POST["create_password"]);
 				//kõik korras
 				//test_input eemaldab pahatahlikud osad
 				}
 			}	
 			if (empty($_POST["age"])){
-			$age_error = " see väli on kohustulik";			
-				} else {
+				$age_error = " see väli on kohustulik";			
+			} else {
 					$age = intval($age);
-					if($age > 5 && $age <100  ){
+				if($age > 5 && $age <100  ){
 					$age_error = "Pane sait kohe kinni, oled interneti kasutamiseks liiga noor või liiga vana";
-						}else{
-						$age=test_input($_POST["age"]);
-						}
-					}		
-			
+				}else{
+					$age=test_input($_POST["age"]);
+					}
+			}		
 			if (empty($_POST["city"])){
-			$city_error = " see väli on kohustulik";			
+				$city_error = " see väli on kohustulik";			
 			} else {
 				$city=test_input($_POST["city"]);	
 				}
 		
-			if($fname_error == "" && $lname_error == "" && $create_email_error == "" && $create_password_error == "" && $age_error = "" && $city_error = ""){
-				
+			if($fname_error =="" && $lname_error =="" && $create_email_error =="" && $create_password_error =="" && $age_error ="" && $city_error ="");
+			
 				//räsi paroolist, mille salvestame andmebaasi
-				$hash = hash("sha512",$create_password);
+			$hash = hash("sha512",$create_password);
 				
-				echo "Võib kasutajat luua! Kasutajanimi on ".$create_email." ja parool on ".$create_password." ja räsi on".$hash;
+				echo "Võib kasutajat luua! Kasutajanimi on ".$create_email." ja parool on ".$create_password." ja räsi on ".$hash.$fname.$lname;
 				
 				// salvestame andmebaasi
-				$stmt = $mysqli->prepare("INSERT INTO users(email, password,first_name,last_name,age,city) VALUES (?,?,?,?,?,?)");
+				$stmt = $mysqli->prepare("INSERT INTO users(email,password,first_name,last_name,age,city) VALUES (?,?,?,?,?,?)");
+				echo $mysqli->error;
+ 				echo $stmt->error;
 				//asendame ? märgid, ss - s on string email, s on string password,i on integer
-				$stmt->bind_param("ssssis",$create_email,$hash,$first_name,$last_name,$age,$city);
+				$stmt->bind_param("ssssis",$create_email,$hash,$fname,$lname,$age,$city);
 				$stmt->execute();
 				$stmt->close();
 			
-			}
-		}	
+			
+		}
 	}
 function test_input($data) {
 	//võtab ära tühikud,enterid jne
@@ -149,7 +151,7 @@ function test_input($data) {
 	//teeb html-i tekstiks
 	$data = htmlspecialchars($data);
 	return $data;
-}
+	}
 	//paneme ühenduse kinni
 	$mysqli->close();
 	
